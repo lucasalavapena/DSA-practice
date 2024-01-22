@@ -1,4 +1,5 @@
 from math import ceil, log2
+from collections import defaultdict
 
 class DSU:
     def __init__(self, N):
@@ -68,3 +69,36 @@ class BIT:
             i -= i & (-i) # sub least sig bit
         return res
     
+
+
+class TrieNode:
+    def __init__(self):
+        self.children = defaultdict(TrieNode)
+        self.is_word = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word: str) -> None:
+        curr = self.root
+        for letter in word:
+            curr = curr.children[letter]
+        curr.is_word = True
+         
+    def search(self, word: str) -> bool:
+        curr = self.root
+        for letter in word:
+            curr = curr.children.get(letter)
+            if curr is None:
+                return False        
+        return curr.is_word
+    
+    def startsWith(self, prefix: str) -> bool:
+        curr = self.root
+        for letter in prefix:
+            curr = curr.children.get(letter)
+            if curr is None:
+                return False        
+        return True
+
