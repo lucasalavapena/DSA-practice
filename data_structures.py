@@ -159,3 +159,36 @@ class MyLinkedList:
         prev.next = nxt
         nxt.prev = prev
         self.len -= 1
+
+
+class MinSegmentTree:
+    def __init__(self, N):
+        self.N = N
+        self.tree = [0] * (2 * N)
+
+    def update(self, idx, val):
+        idx += self.N
+        self.tree[idx] = val
+
+        while idx > 1:
+            # xor is used to get the sibling
+            self.tree[idx//2] = min(self.tree[idx], self.tree[idx ^ 1])
+            idx >>= 1 # to get parent
+
+
+    def query(self, start, end):
+        start += self.N
+        end += self.N
+        ans = float("inf")
+        # you can also do this recursively
+        # note here we are starting at both individual nodes and then and going up
+        while start < end:
+            if start % 2: 
+                ans = min(self.tree[start], ans)
+                start += 1
+            if end % 2: 
+                end -= 1
+                ans = min(self.tree[end], ans)
+            start >>= 1 # get parents
+            end >>= 1 # get parents
+        return ans
