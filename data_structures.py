@@ -102,3 +102,60 @@ class Trie:
                 return False        
         return True
 
+
+class ListNode:
+    def __init__(self, val=0, nxt=None, prv=None):
+        self.val = val
+        self.next = nxt
+        self.prev = prv
+
+
+class MyLinkedList:
+    def __init__(self):
+        self.head = ListNode(val=-1)
+        self.tail = ListNode(val=-2)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+        self.len = 0
+
+    def get(self, index: int) -> int:
+        if index >= self.len: return -1
+        curr = self.head
+        for _ in range(index + 1):
+            curr = curr.next
+        return curr.val
+        
+
+    def addAtHead(self, val: int) -> None:
+        self.addAtIndex(0, val)
+
+
+    def addAtTail(self, val: int) -> None:
+        self.addAtIndex(self.len, val)
+
+
+    def addAtIndex(self, index: int, val: int) -> None:
+        if index > self.len: return
+        curr = self.head
+        for _ in range(index):
+            curr = curr.next
+        # insert and update next and prev
+        curr_next = curr.next
+        new_node = ListNode(val=val, prv=curr, nxt=curr_next)
+        curr.next = new_node
+        # this might be none if at end
+        if curr_next:
+            curr_next.prev = new_node
+        self.len += 1
+
+    def deleteAtIndex(self, index: int) -> None:
+        if index >= self.len: return
+        curr = self.head 
+        for _ in range(index+1):
+            curr = curr.next
+        # get ith index node which we want to delete and skip
+        prev = curr.prev
+        nxt = curr.next
+        prev.next = nxt
+        nxt.prev = prev
+        self.len -= 1
