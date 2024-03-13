@@ -3,8 +3,8 @@ from collections import defaultdict
 
 class DSU:
     def __init__(self, N):
-        self.p = list(range(N)) # parent
-        self.counts = [0] * N # i think rather than counts, ranks are also sometimes used
+        self.p = list(range(N))
+        self.sizes = [1] * N
 
     def find(self, x):
         if self.p[x] != x:
@@ -15,14 +15,19 @@ class DSU:
         xr = self.find(x)
         yr = self.find(y)
         if xr == yr: return False
-        # add to the larger one
-        elif self.counts[xr] < self.counts[yr]:
-            self.p[xr] = yr
-            self.counts[yr] += self.counts[xr]
-            # could set self.counts[xr] = 0 and same below
-        else:
-            self.p[yr] = xr
-            self.counts[xr] += self.counts[yr]
+        if self.sizes[xr] < self.sizes[yr]:
+            xr, yr  = yr, xr
+
+        self.sizes[xr] += self.sizes[yr]
+        self.p[yr] = xr
+        return True
+
+    def is_connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+    def get_size(self, x):
+        xr = self.find(x)
+        return self.sizes[xr]
 
 
 class SparseTable:
