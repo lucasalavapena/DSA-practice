@@ -73,7 +73,66 @@ class BIT:
             res += self.sums[i]
             i -= i & (-i) # sub least sig bit
         return res
-    
+
+class BIT_2D:
+    def __init__(self, matrix: List[List[int]]):
+        self.m = len(matrix)
+        self.n = len(matrix[0])
+
+        self.sums = [[0] * (self.n + 1) for _ in range(self.m + 1)]
+
+        for r in range(self.m):
+            for c in range(self.n):
+                self.sums[r + 1][c + 1] = matrix[r][c]
+
+        for r in range(1, self.m + 1):
+            for c in range(1, self.n + 1):
+                parent_c = c + (c & -c)
+                if parent_c <= self.n:
+                    self.sums[r][parent_c] += self.sums[r][c]
+
+        for r in range(1, self.m + 1):
+            parent_r = r + (r & -r)
+            if parent_r <= self.m:
+                for c in range(1, self.n + 1):
+                    self.sums[parent_r][c] += self.sums[r][c]
+
+    def update(self, i: int, j: int, delta: int) -> None:
+        while i <= self.m:
+            j2 = j
+            while j2 <= self.n:
+                self.sums[i][j2] += delta
+                j2 += j2 & (-j2)
+            i += i & (-i)
+
+    def query(self, i: int, j: int) -> int:
+        res = 0
+        while i > 0:
+            j2 = j
+            while j2 > 0:
+                res += self.sums[i][j2]
+                j2 -= j2 & (-j2)
+            i -= i & (-i)
+        return res
+
+
+class NumMatrix:
+
+    def __init__(self, matrix: List[List[int]]):
+        self.matrix = matrix
+        self.bit = BIT_2D(matrix)
+
+    def update(self, row: int, col: int, val: int) -> None:
+        prev_val = self.matrix[row][col]
+        self.bit.update(row + 1, col + 1, val - prev_val)
+        self.matrix[row][col] = val
+
+    def sumRegion(self, row1: int, col1: int, row2: int, col2: int) -> int:
+        intersection = self.bit.query(row1, col1)
+        top = self.bit.query(row1, col2 + 1)
+        left = self.bit.query(row2 + 1, col1)
+        total = self.bit.query(row2 + 1, col2 + 1)
+        return total - left - top + intersection
 
 
 class TrieNode:
